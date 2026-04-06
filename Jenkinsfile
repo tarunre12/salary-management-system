@@ -87,6 +87,13 @@ EC2_PUBLIC_IP=${EC2_IP}
                 
                 // Using withCredentials instead of sshagent plugin to avoid Windows ssh-agent service error 1058
                 withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                    // Fix Windows OpenSSH file permission requirements (Error: UNPROTECTED PRIVATE KEY FILE)
+                    // We lock the file to only the current Jenkins runner user using standard Windows access lists
+                    bat '''
+                        icacls "%SSH_KEY%" /inheritance:r
+                        FOR /F "tokens=*" %%i IN ('whoami') DO icacls "%SSH_KEY%" /grant "%%i:R"
+                    '''
+
                     // Copy compose file and .env file to EC2 using the injected SSH key
                     bat "scp -i \"%SSH_KEY%\" -o StrictHostKeyChecking=no docker-compose.yml ${EC2_USER}@${EC2_IP}:/home/${EC2_USER}/docker-compose.yml"
                     bat "scp -i \"%SSH_KEY%\" -o StrictHostKeyChecking=no .env.production ${EC2_USER}@${EC2_IP}:/home/${EC2_USER}/.env"
