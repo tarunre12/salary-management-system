@@ -62,7 +62,11 @@ pipeline {
             steps {
                 echo 'Pushing to Docker Hub...'
                 withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    bat "echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin"
+                    // Using a file to pass the password to avoid Windows CMD trailing space issues with echo 
+                    writeFile file: 'dockerpass.txt', text: DOCKER_PASS
+                    bat "docker login -u %DOCKER_USER% --password-stdin < dockerpass.txt"
+                    bat "del dockerpass.txt"
+                    
                     bat "docker push ${DOCKER_USERNAME}/salary-backend:latest"
                     bat "docker push ${DOCKER_USERNAME}/salary-frontend:latest"
                 }
