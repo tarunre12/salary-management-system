@@ -85,15 +85,15 @@ DOCKER_USERNAME=${DOCKER_USERNAME}
 EC2_PUBLIC_IP=${EC2_IP}
 """
                 
-                // Using SSH Agent plugin
-                sshagent([SSH_CREDENTIALS_ID]) {
-                    // Copy compose file and .env file to EC2
-                    bat "scp -o StrictHostKeyChecking=no docker-compose.yml ${EC2_USER}@${EC2_IP}:/home/${EC2_USER}/docker-compose.yml"
-                    bat "scp -o StrictHostKeyChecking=no .env.production ${EC2_USER}@${EC2_IP}:/home/${EC2_USER}/.env"
+                // Using withCredentials instead of sshagent plugin to avoid Windows ssh-agent service error 1058
+                withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                    // Copy compose file and .env file to EC2 using the injected SSH key
+                    bat "scp -i \"%SSH_KEY%\" -o StrictHostKeyChecking=no docker-compose.yml ${EC2_USER}@${EC2_IP}:/home/${EC2_USER}/docker-compose.yml"
+                    bat "scp -i \"%SSH_KEY%\" -o StrictHostKeyChecking=no .env.production ${EC2_USER}@${EC2_IP}:/home/${EC2_USER}/.env"
                     
                     // Start services on EC2
                     bat """
-                    ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} ^
+                    ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} ^
                     "docker-compose pull && docker-compose up -d"
                     """
                 }
