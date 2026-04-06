@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Replace with your Docker Hub credentials ID and username
-        DOCKER_CREDENTIALS_ID = 'docker-cred'
+        DOCKER_CREDENTIALS_ID = 'dockersalarycred'
         DOCKER_USERNAME = 'tarunre16'
         
         // AWS EC2 Details
