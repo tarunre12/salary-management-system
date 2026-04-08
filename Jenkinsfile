@@ -7,7 +7,7 @@ pipeline {
         DOCKER_USERNAME = 'tarunre16'
         
         // AWS EC2 Details
-        EC2_IP = '54.173.224.186'
+        EC2_IP = '100.31.98.11'
         EC2_USER = 'ubuntu' // typically 'ec2-user' for Amazon Linux or 'ubuntu' for Ubuntu
         SSH_CREDENTIALS_ID = 'salary-deploy' // Jenkins credentials ID for SSH private key
 
