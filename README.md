@@ -40,7 +40,7 @@ A full-stack Salary Management System built using React (Vite) and Node.js. This
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repository-url>
+   git clone https://github.com/tarunre12/salary-management-system.git
    cd Salary-Management-System
    ```
 
